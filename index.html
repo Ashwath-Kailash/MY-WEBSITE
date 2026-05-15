@@ -1,34 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gmail Chat App</title>
+  <title>WhatsApp Clone</title>
+
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #111;
+      color: white;
+    }
+
+    header {
+      background: #25D366;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #loginBtn {
+      margin: 20px;
+      padding: 10px 20px;
+      border: none;
+      background: white;
+      color: black;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    #chatBox {
+      display: none;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .msg {
+      max-width: 70%;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 10px;
+      word-wrap: break-word;
+    }
+
+    .me {
+      background: #25D366;
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .other {
+      background: #333;
+      align-self: flex-start;
+    }
+
+    #inputBox {
+      display: flex;
+      padding: 10px;
+      background: #222;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px;
+      background: #25D366;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
-<body style="font-family:Arial; text-align:center; background:black; color:white;">
+<body>
 
-<h2>Gmail Chat App</h2>
+<header>WhatsApp Clone</header>
 
-<button onclick="login()">Login with Google</button>
-<button onclick="logout()">Logout</button>
+<button id="loginBtn" onclick="login()">Login with Google</button>
 
-<p id="user"></p>
-
-<div id="chat" style="display:none;">
-  <input id="msg" placeholder="Type message">
-  <button onclick="sendMsg()">Send</button>
+<div id="chatBox">
 
   <div id="messages"></div>
+
+  <div id="inputBox">
+    <input id="msg" placeholder="Type a message">
+    <button onclick="sendMsg()">Send</button>
+  </div>
+
 </div>
 
 <script>
-// 🔥 YOUR FIREBASE CONFIG (replace this)
+// 🔥 Firebase config (PUT YOURS HERE)
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
+  projectId: "YOUR_PROJECT"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -36,34 +119,29 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Login
-function login(){
+// LOGIN
+function login() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider);
 }
 
-// Logout
-function logout(){
-  auth.signOut();
-}
-
-// Auth state
+// AUTH STATE
 auth.onAuthStateChanged(user => {
-  if(user){
-    document.getElementById("user").innerText =
-      "Logged in: " + user.email;
-
-    document.getElementById("chat").style.display = "block";
+  if (user) {
+    document.getElementById("loginBtn").style.display = "none";
+    document.getElementById("chatBox").style.display = "flex";
     loadMessages();
   }
 });
 
-// Send message
-function sendMsg(){
-  const msg = document.getElementById("msg").value;
+// SEND MESSAGE
+function sendMsg() {
+  const text = document.getElementById("msg").value;
+
+  if (text === "") return;
 
   db.collection("messages").add({
-    text: msg,
+    text: text,
     user: auth.currentUser.email,
     time: Date.now()
   });
@@ -71,16 +149,30 @@ function sendMsg(){
   document.getElementById("msg").value = "";
 }
 
-// Load messages
-function loadMessages(){
-  db.collection("messages").orderBy("time")
-  .onSnapshot(snapshot => {
-    let html = "";
-    snapshot.forEach(doc => {
-      html += `<p><b>${doc.data().user}</b>: ${doc.data().text}</p>`;
+// LOAD MESSAGES (REAL TIME)
+function loadMessages() {
+  db.collection("messages")
+    .orderBy("time")
+    .onSnapshot(snapshot => {
+      let html = "";
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+
+        const isMe = data.user === auth.currentUser.email;
+
+        html += `
+          <div class="msg ${isMe ? "me" : "other"}">
+            <b>${data.user}</b><br>
+            ${data.text}
+          </div>
+        `;
+      });
+
+      const box = document.getElementById("messages");
+      box.innerHTML = html;
+      box.scrollTop = box.scrollHeight;
     });
-    document.getElementById("messages").innerHTML = html;
-  });
 }
 </script>
 
