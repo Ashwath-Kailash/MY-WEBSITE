@@ -3,38 +3,40 @@
 <head>
   <title>WhatsApp Clone</title>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <!-- Firebase (IMPORTANT: compat version for simple HTML) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
-      background: #111;
+      background: #0b141a;
       color: white;
     }
 
     header {
-      background: #25D366;
+      background: #075e54;
       padding: 15px;
       font-size: 20px;
       font-weight: bold;
+      text-align: center;
     }
 
     #loginBtn {
       margin: 20px;
-      padding: 10px 20px;
+      padding: 12px 20px;
       border: none;
+      border-radius: 8px;
+      cursor: pointer;
       background: white;
       color: black;
-      cursor: pointer;
-      border-radius: 8px;
     }
 
-    #chatBox {
+    #chat {
       display: none;
-      height: 80vh;
+      height: 85vh;
       display: flex;
       flex-direction: column;
     }
@@ -43,6 +45,8 @@
       flex: 1;
       padding: 10px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .msg {
@@ -54,20 +58,20 @@
     }
 
     .me {
-      background: #25D366;
+      background: #25d366;
       align-self: flex-end;
       text-align: right;
     }
 
     .other {
-      background: #333;
+      background: #2a3942;
       align-self: flex-start;
     }
 
     #inputBox {
       display: flex;
       padding: 10px;
-      background: #222;
+      background: #1f2c34;
     }
 
     input {
@@ -80,10 +84,10 @@
     button {
       margin-left: 10px;
       padding: 10px;
-      background: #25D366;
       border: none;
-      color: white;
       border-radius: 5px;
+      background: #25d366;
+      color: white;
       cursor: pointer;
     }
   </style>
@@ -95,23 +99,21 @@
 
 <button id="loginBtn" onclick="login()">Login with Google</button>
 
-<div id="chatBox">
-
+<div id="chat">
   <div id="messages"></div>
 
   <div id="inputBox">
-    <input id="msg" placeholder="Type a message">
+    <input id="msg" placeholder="Type message">
     <button onclick="sendMsg()">Send</button>
   </div>
-
 </div>
 
 <script>
-// 🔥 Firebase config (PUT YOURS HERE)
+/* 🔥 FIREBASE CONFIG - REPLACE THIS */
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT"
+  projectId: "YOUR_PROJECT_ID",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -119,26 +121,31 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// LOGIN
+/* 🔐 LOGIN */
 function login() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+
+  auth.signInWithPopup(provider)
+    .then(user => {
+      console.log("Logged in:", user.user.email);
+    })
+    .catch(err => alert(err.message));
 }
 
-// AUTH STATE
+/* 👤 AUTH STATE */
 auth.onAuthStateChanged(user => {
   if (user) {
     document.getElementById("loginBtn").style.display = "none";
-    document.getElementById("chatBox").style.display = "flex";
+    document.getElementById("chat").style.display = "flex";
     loadMessages();
   }
 });
 
-// SEND MESSAGE
+/* 💬 SEND MESSAGE */
 function sendMsg() {
   const text = document.getElementById("msg").value;
 
-  if (text === "") return;
+  if (!text) return;
 
   db.collection("messages").add({
     text: text,
@@ -149,7 +156,7 @@ function sendMsg() {
   document.getElementById("msg").value = "";
 }
 
-// LOAD MESSAGES (REAL TIME)
+/* 📡 REAL-TIME MESSAGES */
 function loadMessages() {
   db.collection("messages")
     .orderBy("time")
@@ -158,7 +165,6 @@ function loadMessages() {
 
       snapshot.forEach(doc => {
         const data = doc.data();
-
         const isMe = data.user === auth.currentUser.email;
 
         html += `
