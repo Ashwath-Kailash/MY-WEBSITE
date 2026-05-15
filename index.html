@@ -1,35 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>My Website</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ashwath Website</title>
 
 <style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
 
 body{
 background:black;
 color:white;
-font-family:Arial;
+overflow:hidden;
+}
+
+/* BACKGROUND ANIMATION */
+
+.stars{
+position:fixed;
+width:100%;
+height:100%;
+background:url('https://i.imgur.com/YKY28eT.png');
+animation:moveStars 100s linear infinite;
+z-index:-1;
+opacity:0.4;
+}
+
+@keyframes moveStars{
+
+from{
+transform:translateY(0);
+}
+
+to{
+transform:translateY(-2000px);
+}
+
+}
+
+/* MAIN */
+
+.container{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
 text-align:center;
-padding-top:100px;
+padding:20px;
 }
 
 h1{
-font-size:60px;
+font-size:80px;
+margin-bottom:20px;
+background:linear-gradient(
+90deg,
+#00bfff,
+#00ffcc,
+#ffffff
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+
+from{
+text-shadow:0 0 20px #00bfff;
+}
+
+to{
+text-shadow:0 0 50px #00ffcc;
+}
+
 }
 
 p{
-font-size:25px;
+font-size:28px;
+margin-bottom:30px;
+color:#ccc;
+}
+
+.buttons{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+button{
+padding:18px 35px;
+font-size:20px;
+border:none;
+border-radius:15px;
+cursor:pointer;
+transition:0.3s;
+font-weight:bold;
+}
+
+.play{
+background:#00bfff;
+color:white;
+}
+
+.play:hover{
+transform:scale(1.1);
+box-shadow:0 0 30px #00bfff;
+}
+
+.about{
+background:#222;
+color:white;
+}
+
+.about:hover{
+transform:scale(1.1);
+background:#333;
+}
+
+/* CARD */
+
+.card{
+margin-top:40px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(15px);
+padding:30px;
+border-radius:25px;
+width:350px;
+box-shadow:0 0 30px rgba(0,191,255,0.2);
+}
+
+.card h2{
+margin-bottom:15px;
+color:#00bfff;
+}
+
+.card p{
+font-size:18px;
+line-height:1.6;
+}
+
+/* FOOTER */
+
+.footer{
+position:absolute;
+bottom:20px;
+width:100%;
+text-align:center;
+color:#777;
+font-size:15px;
 }
 
 </style>
 
 </head>
-
 <body>
 
-<h1>WELCOME</h1>
+<div class="stars"></div>
 
-<p>My website is now online 🚀</p>
+<div class="container">
+
+<h1>ASHWATH</h1>
+
+<p>
+Welcome to my real website 🚀
+</p>
+
+<div class="buttons">
+
+<button class="play"
+onclick="showMessage()">
+Enter Website
+</button>
+
+<button class="about"
+onclick="aboutMe()">
+About
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Future Projects</h2>
+
+<p>
+
+✔ AI Chat App<br>
+✔ 3D Car Game<br>
+✔ Shopping Website<br>
+✔ High Graphics Projects
+
+</p>
+
+</div>
+
+</div>
+
+<div class="footer">
+© 2026 Ashwath Website
+</div>
+
+<script>
+
+function showMessage(){
+
+alert(
+"Welcome To Ashwath Website 🚀"
+);
+
+}
+
+function aboutMe(){
+
+alert(
+"Created by Ashwath Kailash"
+);
+
+}
+
+</script>
 
 </body>
 </html>
